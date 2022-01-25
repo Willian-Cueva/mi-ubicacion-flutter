@@ -1,69 +1,101 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-// import 'package:location/location.dart';
-import '../location.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+final Set<Marker> _markers = Set();
 
 class MiUbicacion extends StatefulWidget {
-  const MiUbicacion({Key? key}) : super(key: key);
-
   @override
-  _MiUbicacionState createState() => _MiUbicacionState();
+  State<MiUbicacion> createState() => MiUbicacionState();
 }
 
-class _MiUbicacionState extends State<MiUbicacion> {
- Location location = Location();
+class MiUbicacionState extends State<MiUbicacion> {
+  Completer<GoogleMapController> _controller = Completer();
 
-// Location location = new Location();
-  // bool servicioUbicacion = location.serviceEnabled();
-  Text _widgetcito() {
-    // LocationData loc = new Lo;
-    // print(loc.latitude);
-    // print(loc.longitude);
-    // print(loc.altitude);
-    return const Text("Desliza la pantalla o oprime el boton de menú");
-  }
-// bool _serviceEnabled=false;
-// PermissionStatus _permissionGranted = null;
-// LocationData _locationData = new LocationData.fromMap(dataMap);
+  static final CameraPosition _ubicacionInicial = CameraPosition(
+    target: LatLng(-0.180653, -78.467834),
+    zoom: 14.4746,
+  );
 
-// _serviceEnabled = await location.serviceEnabled();
-// if (!_serviceEnabled) {
-//   _serviceEnabled = await location.requestService();
-//   if (!_serviceEnabled) {
-//     return;
-//   }
-// }
-
-// _permissionGranted = await location.hasPermission();
-// if (_permissionGranted == PermissionStatus.denied) {
-//   _permissionGranted = await location.requestPermission();
-//   if (_permissionGranted != PermissionStatus.granted) {
-//     return;
-//   }
-// }
-
-// _locationData = await location.getLocation();
+  static CameraPosition camPosicionUbicacion = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(-0.180653, -78.467834),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const Drawer(
-        semanticLabel: "Hola Mijines",
-      ),
-      appBar: AppBar(
-        title:const Text("Mi Ubicación"),
-      ),
-      body:  Column(
-        children: <Widget>[Text(location.getLocation().toString()), const Text("")],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.info),
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) =>
-                  AlertDialog(content: _widgetcito()));
+    return new Scaffold(
+      body: GoogleMap(
+        markers: _markers,
+        mapType: MapType.normal,
+        initialCameraPosition: _ubicacionInicial,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
         },
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _goToTheLake,
+        label: Text('Mi ubicacion!'),
+        icon: Icon(Icons.directions_boat),
+      ),
     );
+  }
+
+  Future<void> _goToTheLake() async {
+    _getUbicacionActual();
+    final GoogleMapController controller = await _controller.future;
+    controller
+        .animateCamera(CameraUpdate.newCameraPosition(camPosicionUbicacion));
+  }
+
+  Future<void> _getUbicacionActual() async {
+    //objeto geolocator que obtendra la ubicaciionactual
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) async {
+      setState(() {
+        //imprimir la posicion actual en log
+        print(position);
+      //Actualizar  camera position
+        camPosicionUbicacion = CameraPosition(
+            bearing: 192.8334901395799,
+            target: LatLng(position.latitude, position.longitude),
+            tilt: 59.440717697143555,
+            zoom: 19.151926040649414);
+      });
+      //agregar marcador con ubicacion actual
+      _markers.add(
+        Marker(
+          markerId: MarkerId('newyork'),
+          position: LatLng(position.latitude, position.longitude),
+        ),
+      );
+      //crear controller google map
+      final GoogleMapController controller = await _controller.future;
+      controller
+          .animateCamera(CameraUpdate.newCameraPosition(camPosicionUbicacion));
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  Future<void> _goToNewYork() async {
+    double lat = 40.7128;
+    double long = -74.0060;
+    GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, long), 10));
+    setState(() {
+      _markers.add(
+        Marker(
+          markerId: MarkerId('Tu ubicacion'),
+          position: LatLng(lat, long),
+        ),
+      );
+    });
   }
 }
