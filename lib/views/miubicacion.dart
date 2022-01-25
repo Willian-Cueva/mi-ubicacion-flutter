@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 // import 'package:location/location.dart';
 import '../location.dart';
 
-class Mi_Ubicacion extends StatefulWidget {
-  const Mi_Ubicacion({Key? key}) : super(key: key);
+class MiUbicacion extends StatefulWidget {
+  const MiUbicacion({Key? key}) : super(key: key);
 
   @override
-  _Mi_UbicacionState createState() => _Mi_UbicacionState();
+  _MiUbicacionState createState() => _MiUbicacionState();
 }
 
-class _Mi_UbicacionState extends State<Mi_Ubicacion> {
-  Location location = new Location();
+class _MiUbicacionState extends State<MiUbicacion> {
+ Location location = Location();
 
 // Location location = new Location();
   // bool servicioUbicacion = location.serviceEnabled();
@@ -19,7 +19,7 @@ class _Mi_UbicacionState extends State<Mi_Ubicacion> {
     // print(loc.latitude);
     // print(loc.longitude);
     // print(loc.altitude);
-    return Text("Desliza la pantalla o oprime el boton de menú");
+    return const Text("Desliza la pantalla o oprime el boton de menú");
   }
 // bool _serviceEnabled=false;
 // PermissionStatus _permissionGranted = null;
@@ -46,18 +46,17 @@ class _Mi_UbicacionState extends State<Mi_Ubicacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
+      drawer: const Drawer(
         semanticLabel: "Hola Mijines",
       ),
       appBar: AppBar(
-        title: Text("Mi Ubicación"),
+        title:const Text("Mi Ubicación"),
       ),
-      body: Container(
-          child: Column(
-        children: <Widget>[Text(location.getLocation().toString()), Text("")],
-      )),
+      body:  Column(
+        children: <Widget>[Text(location.getLocation().toString()), const Text("")],
+      ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.info),
+        child: const Icon(Icons.info),
         onPressed: () {
           showDialog(
               context: context,

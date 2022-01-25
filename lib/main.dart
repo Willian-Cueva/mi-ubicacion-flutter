@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './views/mi_ubicacion.dart';
+import 'views/miubicacion.dart';
 // import './views/flutter_location.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Mi_Ubicacion(),
+      home: const MiUbicacion(),
       debugShowCheckedModeBanner: false,
     );
   }
