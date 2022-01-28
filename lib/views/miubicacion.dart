@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:ubicacion/views/milocalizacion.dart';
 
 class MiUbicacion extends StatefulWidget {
   // const MiUbicacion({Key? key}) : super(key: key);
@@ -17,26 +18,9 @@ class _MiUbicacionState extends State<MiUbicacion> {
   // GoogleMapController _mapController = GoogleMapController.init(id, initialCameraPosition, googleMapState);
   Set<Marker> _createMarkers() {
     var tmp = Set<Marker>();
-    tmp.add(
-        Marker(markerId: MarkerId("fromPoint"), position: widget.fromPoint));
+    tmp.add(Marker(
+        markerId: const MarkerId("fromPoint"), position: widget.fromPoint));
     return tmp;
-  }
-
-  void _onMapCrated(GoogleMapController controller) {
-    var _mapController = controller;
-    _centerView(_mapController);
-  }
-
-  _centerView(GoogleMapController _mapController) async {
-    await _mapController.getVisibleRegion();
-    var left = min(widget.fromPoint.latitude, widget.toPoint.latitude);
-    var rigth = max(widget.fromPoint.latitude, widget.toPoint.latitude);
-    var top = max(widget.fromPoint.longitude, widget.toPoint.longitude);
-    var buttom = min(widget.fromPoint.longitude, widget.toPoint.longitude);
-    var bounds = LatLngBounds(
-        southwest: LatLng(left, buttom), northeast: LatLng(rigth, top));
-    var cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 50);
-    _mapController.animateCamera(cameraUpdate);
   }
 
   @override
@@ -44,6 +28,15 @@ class _MiUbicacionState extends State<MiUbicacion> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Mi Ubicacion"),
+        leading: IconButton(
+          icon: Icon(Icons.my_location),
+          onPressed: () {
+            setState(() {
+              Navigator.push(
+                  context, new MaterialPageRoute(builder: (context) => MiLocalizacion()));
+            });
+          },
+        ),
       ),
       body: GoogleMap(
         myLocationButtonEnabled: true,
@@ -53,7 +46,6 @@ class _MiUbicacionState extends State<MiUbicacion> {
           zoom: 17,
         ),
         markers: _createMarkers(),
-        onMapCreated: _onMapCreated(controller),
       ),
     );
   }
